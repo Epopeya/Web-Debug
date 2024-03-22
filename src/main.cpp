@@ -40,8 +40,8 @@ typedef enum { Message,
 struct packet_state {
   const char *messages[1000];
   int messages_length;
-  vector_t *target_direction;
-  vector_t *current_direction;
+  float *target_direction;
+  float *current_direction;
   vector2_t *position;
 };
 
@@ -52,10 +52,10 @@ void recv_serial_packet() {
   if (hs.available() > 0) {
     // read() is non-blocking, may cause problems later!
     int header = hs.read();
-    int len = hs.read();
     switch (header) {
       case Message:
         {
+          int len = hs.read();
           char *message = (char *)malloc(len);
           hs.readBytes(message, len);
           state.messages[state.messages_length] = message;
@@ -64,19 +64,15 @@ void recv_serial_packet() {
         }
       case TargetDirection:
         {
-          vector_t *dir = (vector_t *)malloc(sizeof(vector_t));
-          hs.readBytes((uint8_t *)&(dir->x), 4);
-          hs.readBytes((uint8_t *)&(dir->y), 4);
-          hs.readBytes((uint8_t *)&(dir->z), 4);
+          float *dir = (float *)malloc(sizeof(float));
+          hs.readBytes((uint8_t *)&dir, sizeof(float));
           state.target_direction = dir;
           break;
         }
       case CurrentDirection:
         {
-          vector_t *dir = (vector_t *)malloc(sizeof(vector_t));
-          hs.readBytes((uint8_t *)&(dir->x), 4);
-          hs.readBytes((uint8_t *)&(dir->y), 4);
-          hs.readBytes((uint8_t *)&(dir->z), 4);
+          float *dir = (float *)malloc(sizeof(float));
+          hs.readBytes((uint8_t *)&dir, sizeof(float));
           state.current_direction = dir;
           break;
         }
@@ -87,7 +83,7 @@ void recv_serial_packet() {
 void send_ws_packet() {
   JsonDocument doc;
   // Message
-  for (int i = 0; i <= state.messages_length; i++) {
+  for (int i = 0; i < state.messages_length; i++) {
     doc["msgs"][i] = state.messages[i];
     free(&state.messages[i]);
     state.messages[i] = NULL;
@@ -95,17 +91,13 @@ void send_ws_packet() {
   state.messages_length = 0;
   // TargetDirection
   if (state.target_direction != NULL) {
-    doc["target"][0] = state.target_direction->x;
-    doc["target"][1] = state.target_direction->y;
-    doc["target"][2] = state.target_direction->z;
+    doc["target"] = state.target_direction;
     free(state.target_direction);
     state.target_direction = NULL;
   }
   // CurrentDirection
   if (state.current_direction != NULL) {
-    doc["dir"][0] = state.target_direction->x;
-    doc["dir"][1] = state.target_direction->y;
-    doc["dir"][2] = state.target_direction->z;
+    doc["dir"] = state.current_direction;
     free(state.current_direction);
     state.current_direction = NULL;
   }
