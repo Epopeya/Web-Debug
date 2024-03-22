@@ -3,9 +3,12 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <WiFi.h>
-#include <cstdio>
-#include <cstring>
 #include <stdint.h>
+#include "vector.h"
+#include <ArduinoJson.h>
+
+#define HEARTBEAT 100
+unsigned long last_heartbeat = 0;
 
 AsyncWebServer webserver(80);
 AsyncWebSocket websocket("/ws");
@@ -32,56 +35,83 @@ void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
 typedef enum { Message,
                TargetDirection,
                CurrentDirection,
-               Servo } DebugHeader;
+               Servo } PacketHeader;
 
-#define PACKET_MSG_HEADER "{\"msg\": \""
-#define PACKET_MSG_FOOTER "\"}"
+struct packet_state {
+  const char *messages[1000];
+  int messages_length;
+  vector_t *target_direction;
+  vector_t *current_direction;
+  vector2_t *position;
+};
 
-void packet_msg() {
-  Serial.println("Packet receveived: Message");
-  uint8_t msg_len = 0;
-  hs.readBytes(&msg_len, 1);
-  uint8_t msg[128 + strlen(PACKET_MSG_HEADER) + strlen(PACKET_MSG_FOOTER)] = {
-    0
-  };
-  memcpy(msg, PACKET_MSG_HEADER, strlen(PACKET_MSG_HEADER));
-  hs.readBytes(msg + strlen(PACKET_MSG_HEADER), (size_t)msg_len);
-  memcpy(msg + strlen(PACKET_MSG_HEADER) + msg_len, PACKET_MSG_FOOTER,
-         strlen(PACKET_MSG_FOOTER));
-  websocket.textAll(msg, msg_len + strlen(PACKET_MSG_HEADER) + strlen(PACKET_MSG_FOOTER));
-}
+struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .position = NULL };
 
-void packet_target_direction() {
-  Serial.println("Packet receveived: Message");
-  uint8_t msg_len = 0;
-  hs.readBytes(&msg_len, 1);
-  uint8_t msg[128 + strlen(PACKET_MSG_HEADER) + strlen(PACKET_MSG_FOOTER)] = { 0 };
-  memcpy(msg, PACKET_MSG_HEADER, strlen(PACKET_MSG_HEADER));
-  hs.readBytes(msg + strlen(PACKET_MSG_HEADER), (size_t)msg_len);
-  memcpy(msg + strlen(PACKET_MSG_HEADER) + msg_len, PACKET_MSG_FOOTER,
-         strlen(PACKET_MSG_FOOTER));
-  websocket.textAll(msg, msg_len + strlen(PACKET_MSG_HEADER) + strlen(PACKET_MSG_FOOTER));
-}
-
-bool recv_packet() {
+// This parser doesn't account for endianness!
+void recv_serial_packet() {
   if (hs.available() > 0) {
-    uint8_t header = -1;
-    hs.readBytes(&header, 1);
+    // read() is non-blocking, may cause problems later!
+    int header = hs.read();
+    int len = hs.read();
     switch (header) {
       case Message:
-        packet_msg();
-        return true;
+        {
+          char *message = (char *)malloc(len);
+          hs.readBytes(message, len);
+          state.messages[state.messages_length] = message;
+          state.messages_length++;
+          break;
+        }
       case TargetDirection:
-        packet_target_direction();
-        return true;
+        {
+          vector_t *dir = (vector_t *)malloc(sizeof(vector_t));
+          hs.readBytes((uint8_t *)&(dir->x), 4);
+          hs.readBytes((uint8_t *)&(dir->y), 4);
+          hs.readBytes((uint8_t *)&(dir->z), 4);
+          state.target_direction = dir;
+          break;
+        }
+      case CurrentDirection:
+        {
+          vector_t *dir = (vector_t *)malloc(sizeof(vector_t));
+          hs.readBytes((uint8_t *)&(dir->x), 4);
+          hs.readBytes((uint8_t *)&(dir->y), 4);
+          hs.readBytes((uint8_t *)&(dir->z), 4);
+          state.current_direction = dir;
+          break;
+        }
     }
   }
-  return false;
 }
 
-void packet_targetdir();
-void packet_curdir();
-void packet_servo();
+void send_ws_packet() {
+  JsonDocument doc;
+  // Message
+  for (int i = 0; i <= state.messages_length; i++) {
+    doc["msgs"][i] = state.messages[i];
+    free(&state.messages[i]);
+    state.messages[i] = NULL;
+  }
+  state.messages_length = 0;
+  // TargetDirection
+  if (state.target_direction != NULL) {
+    doc["target"][0] = state.target_direction->x;
+    doc["target"][1] = state.target_direction->y;
+    doc["target"][2] = state.target_direction->z;
+    free(state.target_direction);
+    state.target_direction = NULL;
+  }
+  // CurrentDirection
+  if (state.current_direction != NULL) {
+    doc["dir"][0] = state.target_direction->x;
+    doc["dir"][1] = state.target_direction->y;
+    doc["dir"][2] = state.target_direction->z;
+    free(state.current_direction);
+    state.current_direction = NULL;
+  }
+  String output = doc.as<String>();
+  websocket.textAll(output);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -104,5 +134,10 @@ void setup() {
 }
 
 void loop() {
-  recv_packet();
+  recv_serial_packet();
+  unsigned long time = millis();
+  if ((time - last_heartbeat) > HEARTBEAT) {
+    last_heartbeat = time;
+    send_ws_packet();
+  }
 }
