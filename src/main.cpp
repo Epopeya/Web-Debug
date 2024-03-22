@@ -65,14 +65,14 @@ void recv_serial_packet() {
       case TargetDirection:
         {
           float *dir = (float *)malloc(sizeof(float));
-          hs.readBytes((uint8_t *)&dir, sizeof(float));
+          hs.readBytes((uint8_t *)dir, sizeof(float));
           state.target_direction = dir;
           break;
         }
       case CurrentDirection:
         {
           float *dir = (float *)malloc(sizeof(float));
-          hs.readBytes((uint8_t *)&dir, sizeof(float));
+          hs.readBytes((uint8_t *)dir, sizeof(float));
           state.current_direction = dir;
           break;
         }
@@ -85,24 +85,28 @@ void send_ws_packet() {
   // Message
   for (int i = 0; i < state.messages_length; i++) {
     doc["msgs"][i] = state.messages[i];
-    free(&state.messages[i]);
-    state.messages[i] = NULL;
   }
-  state.messages_length = 0;
   // TargetDirection
   if (state.target_direction != NULL) {
-    doc["target"] = state.target_direction;
+    doc["target"] = *state.target_direction;
     free(state.target_direction);
     state.target_direction = NULL;
   }
   // CurrentDirection
   if (state.current_direction != NULL) {
-    doc["dir"] = state.current_direction;
+    doc["dir"] = *state.current_direction;
     free(state.current_direction);
     state.current_direction = NULL;
   }
   String output = doc.as<String>();
   websocket.textAll(output);
+
+  // Free messages afterwards as they don't get deep copied
+  for (int i = 0; i < state.messages_length; i++) {
+    free((void *)state.messages[i]);  // Shouldn't have to cast here but won't compile otherwise
+    state.messages[i] = NULL;
+  }
+  state.messages_length = 0;
 }
 
 void setup() {
