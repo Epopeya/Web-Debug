@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Message",
+  "type": "object",
+  "properties": {
+    "pos": {
+      "description": "Current position",
+      "$ref": "#/$defs/position"
+    },
+    "rot": {
+      "description": "Current rotation",
+      "type": "number"
+    },
+    "trot": {
+      "description": "Target rotation",
+      "type": "number"
+    },
+    "bat": {
+      "description": "Battery voltage",
+      "type": "number"
+    },
+    "msgs": {
+      "description": "Miscellaneous messages",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "route": {
+      "description": "Array of defined waypoints",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/position"
+      }
+    }
+  },
+  "$defs": {
+    "position": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    }
+  }
+}
