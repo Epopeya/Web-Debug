@@ -38,7 +38,7 @@ typedef enum { Message,
                Servo } PacketHeader;
 
 struct packet_state {
-  const char *messages[1000];
+  char *messages[1000];
   int messages_length;
   float *target_direction;
   float *current_direction;
@@ -64,14 +64,18 @@ void recv_serial_packet() {
         }
       case TargetDirection:
         {
-          float *dir = (float *)malloc(sizeof(float));
+          float *dir;
+          if (state.target_direction == NULL) dir = (float *)malloc(sizeof(float));
+          else dir = state.target_direction;
           hs.readBytes((uint8_t *)dir, sizeof(float));
           state.target_direction = dir;
           break;
         }
       case CurrentDirection:
         {
-          float *dir = (float *)malloc(sizeof(float));
+          float *dir;
+          if (state.current_direction == NULL) dir = (float *)malloc(sizeof(float));
+          else dir = state.current_direction;
           hs.readBytes((uint8_t *)dir, sizeof(float));
           state.current_direction = dir;
           break;
@@ -103,7 +107,7 @@ void send_ws_packet() {
 
   // Free messages afterwards as they don't get deep copied
   for (int i = 0; i < state.messages_length; i++) {
-    free((void *)state.messages[i]);  // Shouldn't have to cast here but won't compile otherwise
+    free(state.messages[i]);
     state.messages[i] = NULL;
   }
   state.messages_length = 0;
