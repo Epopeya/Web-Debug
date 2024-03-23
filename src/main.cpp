@@ -102,8 +102,11 @@ void send_ws_packet() {
     free(state.current_direction);
     state.current_direction = NULL;
   }
-  String output = doc.as<String>();
-  websocket.textAll(output);
+
+  if (!doc.isNull()) {
+    String output = doc.as<String>();
+    websocket.textAll(output);
+  }
 
   // Free messages afterwards as they don't get deep copied
   for (int i = 0; i < state.messages_length; i++) {
