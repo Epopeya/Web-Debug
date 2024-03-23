@@ -50,12 +50,12 @@ struct packet_state state = { .messages = { NULL }, .messages_length = 0, .targe
 // This parser doesn't account for endianness!
 void recv_serial_packet() {
   if (hs.available() > 0) {
-    // read() is non-blocking, may cause problems later!
     int header = hs.read();
     switch (header) {
       case Message:
         {
-          int len = hs.read();
+          uint8_t len = 0;
+          hs.readBytes(&len, 1);
           char *message = (char *)malloc(len);
           hs.readBytes(message, len);
           state.messages[state.messages_length] = message;
