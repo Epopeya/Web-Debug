@@ -92,13 +92,13 @@ void send_ws_packet() {
   }
   // TargetDirection
   if (state.target_direction != NULL) {
-    doc["target"] = *state.target_direction;
+    doc["trot"] = *state.target_direction;
     free(state.target_direction);
     state.target_direction = NULL;
   }
   // CurrentDirection
   if (state.current_direction != NULL) {
-    doc["dir"] = *state.current_direction;
+    doc["rot"] = *state.current_direction;
     free(state.current_direction);
     state.current_direction = NULL;
   }
