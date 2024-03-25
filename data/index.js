@@ -3,7 +3,10 @@ const status_label = document.querySelector(".bar .status");
 const msg_text = document.querySelector(".panel.msg .content > code");
 const battery_voltage = document.querySelector(".panel.status .content #battery_voltage");
 
-const socket = new WebSocket("ws://localhost:1234");
+var socket_url = new URL("/ws", window.location.href);
+socket_url.protocol = socket_url.protocol.replace("http", "ws");
+console.log("Websocket URL: ", socket_url.href);
+const socket = new WebSocket(socket_url.href);
 
 const map_img = new Image();
 map_img.src = "map.svg";
