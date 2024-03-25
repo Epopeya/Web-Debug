@@ -56,7 +56,8 @@ void recv_serial_packet() {
         {
           uint8_t len = 0;
           hs.readBytes(&len, 1);
-          char *message = (char *)malloc(len);
+          char *message = (char *)malloc(len + 1);
+          message[len] = '\0';
           hs.readBytes(message, len);
           state.messages[state.messages_length] = message;
           state.messages_length++;
