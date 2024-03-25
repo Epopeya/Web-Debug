@@ -32,11 +32,13 @@ void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
   }
 }
 
-typedef enum { Message,
-               TargetDirection,
-               CurrentDirection,
-               Battery,
-               Servo } PacketHeader;
+typedef enum {
+  Message,
+  TargetDirection,
+  CurrentDirection,
+  Battery,
+  Position
+} PacketHeader;
 
 struct packet_state {
   char *messages[1000];
@@ -92,6 +94,16 @@ void recv_serial_packet() {
           state.battery = bat;
           break;
         }
+      case Position:
+        {
+          vector2_t *pos;
+          if (state.position == NULL) pos = (vector2_t *)malloc(sizeof(vector2_t));
+          else pos = state.position;
+          hs.readBytes((uint8_t *)&pos->x, sizeof(float));
+          hs.readBytes((uint8_t *)&pos->y, sizeof(float));
+          state.position = pos;
+          break;
+        }
     }
   }
 }
@@ -119,6 +131,13 @@ void send_ws_packet() {
     doc["bat"] = *state.battery;
     free(state.battery);
     state.battery = NULL;
+  }
+  // Position
+  if (state.position != NULL) {
+    doc["pos"][0] = state.position->x;
+    doc["pos"][1] = state.position->y;
+    free(state.position);
+    state.position = NULL;
   }
 
   if (!doc.isNull()) {
