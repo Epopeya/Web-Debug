@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="bar">
+            <div class="ping">0 ms</div>
+            <div class="status disconnected"></div>
+        </div>
+        <div class="dashboard">
+            <div class="panel map">
+                <div class="name">Map</div>
+                <div class="content">
+                    <canvas width="1200" height="1200">
+                    </canvas>
+                </div>
+            </div>
+            <div class="panel msg">
+                <div class="name">Messages</div>
+                <div class="content">
+                    <code>
+                    </code>
+                </div>
+            </div>
+            <div class="panel status">
+                <div class="name">Status</div>
+                <div class="content">
+                    <ul>
+                        <li class="waiting">Battery: <span id="battery_voltage">--</span> V</li>
+                        <li class="ok">Data: 123</li>
+                        <li class="warn">Data: 420</li>
+                        <li class="ok">Data: 69</li>
+                        <li class="err">Data: 12</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="name"></div>
+            </div>
+        </div>
+
+        <script defer src="index.js"></script>
+    </body>
+</html>
