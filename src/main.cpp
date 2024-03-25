@@ -35,6 +35,7 @@ void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client,
 typedef enum { Message,
                TargetDirection,
                CurrentDirection,
+               Battery,
                Servo } PacketHeader;
 
 struct packet_state {
@@ -42,10 +43,11 @@ struct packet_state {
   int messages_length;
   float *target_direction;
   float *current_direction;
+  float *battery;
   vector2_t *position;
 };
 
-struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .position = NULL };
+struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL };
 
 // This parser doesn't account for endianness!
 void recv_serial_packet() {
@@ -81,6 +83,15 @@ void recv_serial_packet() {
           state.current_direction = dir;
           break;
         }
+      case Battery:
+        {
+          float *bat;
+          if (state.battery == NULL) bat = (float *)malloc(sizeof(float));
+          else bat = state.battery;
+          hs.readBytes((uint8_t *)bat, sizeof(float));
+          state.battery = bat;
+          break;
+        }
     }
   }
 }
@@ -102,6 +113,12 @@ void send_ws_packet() {
     doc["rot"] = *state.current_direction;
     free(state.current_direction);
     state.current_direction = NULL;
+  }
+  // Battery
+  if (state.battery != NULL) {
+    doc["bat"] = *state.battery;
+    free(state.battery);
+    state.battery = NULL;
   }
 
   if (!doc.isNull()) {
