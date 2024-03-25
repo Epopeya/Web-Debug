@@ -141,26 +141,17 @@ html, body {
 }
 
 .panel.status > .content > ul li.err {
-    animation: status-err 2.5s infinite;
+    animation: status-err 0.6s infinite;
     animation-direction: alternate;
+    animation-timing-function: ease-in;
 }
 
 @keyframes status-err {
     0% {
         background-color: #E06C7533;
-        outline: 0px solid #E06C7533;
-    }
-    80% {
-        background-color: #E06C7533;
-        outline: 0px solid #E06C7533;
-    }
-    95% {
-        background-color: #E06C7555;
-        outline: 5px solid #E06C7555;
     }
     100% {
         background-color: #E06C7555;
-        outline: 5px solid #E06C7555;
     }
 }
 
