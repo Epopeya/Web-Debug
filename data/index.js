@@ -21,6 +21,8 @@ function drawMap() {
     const ctx = canvas.getContext("2d");
     ctx.save();
     
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, 1200, 1200);
     ctx.drawImage(map_img, 0, 0, 1200, 1200);
 
     ctx.translate(600.5, 600.5);
