@@ -69,7 +69,7 @@ function drawMap() {
             ctx.translate(robot_pos[0], robot_pos[1]);
             ctx.rotate(robot_trot - Math.PI/2);
             ctx.strokeStyle = "#2222DD";
-            ctx.lineWidth = 10;
+            ctx.lineWidth = 20;
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.lineTo(0, 750);
@@ -82,7 +82,7 @@ function drawMap() {
         ctx.rotate(robot_rot - Math.PI/2);
         ctx.fillRect(-150/2, -150/2, 150, 200);
         ctx.strokeStyle = "#DD2222";
-        ctx.lineWidth = 20;
+        ctx.lineWidth = 40;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(0, 500);
