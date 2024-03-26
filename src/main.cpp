@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "vector.h"
 #include <ArduinoJson.h>
+#include <LittleFS.h>
 
 #define HEARTBEAT 100
 unsigned long last_heartbeat = 0;
@@ -160,6 +161,21 @@ void setup() {
   // WiFi
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  LittleFS.begin();
+  webserver.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", LittleFS.open("/index.html").readString());
+  });
+  webserver.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "application/javascript", LittleFS.open("/index.js").readString());
+  });
+  webserver.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/css", LittleFS.open("/style.css").readString());
+  });
+  // webserver.on("/map.svg", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   request->send(200, "image/svg+xml", LittleFS.open("/map.svg").readString());
+  // });
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
