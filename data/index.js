@@ -64,22 +64,22 @@ function drawMap() {
     }
 
     if (robot_pos != undefined && robot_rot != undefined) {
-        if (robot_trot) {
+        if (robot_trot != undefined) {
             ctx.save();
             ctx.translate(robot_pos[0], robot_pos[1]);
-            ctx.rotate((robot_trot * -Math.PI) / 180);
+            ctx.rotate(robot_trot - Math.PI/2);
             ctx.strokeStyle = "#2222DD";
             ctx.lineWidth = 10;
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(0, 500);
+            ctx.lineTo(0, 750);
             ctx.stroke();
             ctx.restore();
         }
         ctx.save();
         ctx.fillStyle = "#DD2222";
         ctx.translate(robot_pos[0], robot_pos[1]);
-        ctx.rotate((-robot_rot + Math.PI/2));
+        ctx.rotate(robot_rot - Math.PI/2);
         ctx.fillRect(-150/2, -150/2, 150, 200);
         ctx.strokeStyle = "#DD2222";
         ctx.lineWidth = 20;
