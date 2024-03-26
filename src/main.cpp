@@ -39,7 +39,8 @@ typedef enum {
   TargetDirection,
   CurrentDirection,
   Battery,
-  Position
+  Position,
+  Route
 } PacketHeader;
 
 struct packet_state {
@@ -49,9 +50,11 @@ struct packet_state {
   float *current_direction;
   float *battery;
   vector2_t *position;
+  vector2_t *route;
+  int route_length;
 };
 
-struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL };
+struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL, .route = NULL, .route_length = 0 };
 
 // This parser doesn't account for endianness!
 void recv_serial_packet() {
@@ -110,6 +113,27 @@ void recv_serial_packet() {
           state.position = pos;
           break;
         }
+      case Route:
+        {
+          uint8_t len = 0;
+          hs.readBytes(&len, 1);
+          vector2_t *route;
+          // Don't reallocate if possible
+          if (state.route != NULL && len == state.route_length) route = state.route;
+          else if (state.route != NULL) {
+            free(state.route);
+            state.route = NULL;
+          }
+          if (state.route == NULL) route = (vector2_t *)malloc(sizeof(vector2_t) * len);
+
+          for (int i = 0; i < len; i++) {
+            hs.readBytes((uint8_t *)&route[i].x, sizeof(float));
+            hs.readBytes((uint8_t *)&route[i].y, sizeof(float));
+          }
+          state.route = route;
+          state.route_length = len;
+          break;
+        }
     }
   }
 }
@@ -144,6 +168,15 @@ void send_ws_packet() {
     doc["pos"][1] = state.position->y;
     free(state.position);
     state.position = NULL;
+  }
+  // Route
+  if (state.route != NULL) {
+    for (int i = 0; i < state.route_length; i++) {
+      doc["route"][i][0] = state.route[i].x;
+      doc["route"][i][1] = state.route[i].y;
+    }
+    free(state.route);
+    state.route_length = 0;
   }
 
   if (!doc.isNull()) {
