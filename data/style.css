@@ -170,6 +170,17 @@ html, body {
     margin: 15px;
 }
 
+.bar > .debug {
+    text-transform: uppercase;
+    font-weight: 300;
+    font-size: 14px;
+    float: right;
+    color: #61AFEF;
+    padding-left: 15px;
+    padding-right: 15px;
+    display: none;
+}
+
 .bar > .status {
     text-transform: uppercase;
     font-weight: 500;

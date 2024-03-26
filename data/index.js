@@ -4,6 +4,12 @@ const msg_text = document.querySelector(".panel.msg .content > code");
 const battery_voltage = document.querySelector(".panel.status .content #battery_voltage");
 
 var socket_url = new URL("/ws", window.location.href);
+const is_local = socket_url.protocol == "file:";
+if (is_local) {
+    log("debug mode");
+    socket_url = new URL("ws://localhost:1234");
+    document.querySelector(".bar .debug").style.display = "block";
+}
 socket_url.protocol = socket_url.protocol.replace("http", "ws");
 console.log("Websocket URL: ", socket_url.href);
 const socket = new WebSocket(socket_url.href);
