@@ -177,9 +177,9 @@ void setup() {
   webserver.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/css", LittleFS.open("/style.css").readString());
   });
-  // webserver.on("/map.svg", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(200, "image/svg+xml", LittleFS.open("/map.svg").readString());
-  // });
+  webserver.on("/map.svg", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "image/svg+xml", LittleFS.open("/map.svg").readString());
+  });
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
