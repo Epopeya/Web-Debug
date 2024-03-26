@@ -9,6 +9,7 @@
 #include <LittleFS.h>
 
 #define HEARTBEAT 100
+#define MAX_MSGS 50
 unsigned long last_heartbeat = 0;
 
 AsyncWebServer webserver(80);
@@ -42,7 +43,7 @@ typedef enum {
 } PacketHeader;
 
 struct packet_state {
-  char *messages[1000];
+  char *messages[MAX_MSGS];
   int messages_length;
   float *target_direction;
   float *current_direction;
@@ -64,8 +65,12 @@ void recv_serial_packet() {
           char *message = (char *)malloc(len + 1);
           message[len] = '\0';
           hs.readBytes(message, len);
-          state.messages[state.messages_length] = message;
-          state.messages_length++;
+          if (state.messages_length < MAX_MSGS) {
+            state.messages[state.messages_length] = message;
+            state.messages_length++;
+          } else {
+            free(message);
+          }
           break;
         }
       case TargetDirection:
