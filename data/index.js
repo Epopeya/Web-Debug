@@ -79,7 +79,7 @@ function drawMap() {
         ctx.save();
         ctx.fillStyle = "#DD2222";
         ctx.translate(robot_pos[0], robot_pos[1]);
-        ctx.rotate((robot_rot * -Math.PI) / 180);
+        ctx.rotate(((-robot_rot + 90) * -Math.PI) / 180);
         ctx.fillRect(-150/2, -150/2, 150, 200);
         ctx.strokeStyle = "#DD2222";
         ctx.lineWidth = 20;
