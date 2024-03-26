@@ -10,6 +10,10 @@ const socket = new WebSocket(socket_url.href);
 
 const map_img = new Image();
 map_img.src = "map.svg";
+map_img.onload(() => {
+    map_loaded = true;
+});
+var map_loaded = false;
 
 let robot_pos;
 let robot_rot;
@@ -23,7 +27,9 @@ function drawMap() {
     
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, 1200, 1200);
-    ctx.drawImage(map_img, 0, 0, 1200, 1200);
+    if (map_loaded) {
+        ctx.drawImage(map_img, 0, 0, 1200, 1200);
+    }
 
     ctx.translate(600.5, 600.5);
     ctx.scale(0.09*4, -0.09*4);
