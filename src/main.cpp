@@ -8,7 +8,7 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-#define HEARTBEAT 100
+#define HEARTBEAT 50
 #define MAX_MSGS 50
 unsigned long last_heartbeat = 0;
 
