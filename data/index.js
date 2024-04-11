@@ -101,11 +101,11 @@ function drawMap() {
 
 function refreshStatus() {
     if (robot_bat) {
-        battery_voltage.innerText = robot_bat;
+        battery_voltage.innerText = Math.round(robot_bat * 10) / 10;
         const li = battery_voltage.parentElement;
-        if (robot_bat < 3.2) {
+        if (robot_bat < 6) {
             li.className = "err";
-        } else if (robot_bat < 3.5) {
+        } else if (robot_bat < 7.2) {
             li.className = "warn";
         } else {
             li.className = "ok";
