@@ -80,36 +80,28 @@ void recv_serial_packet() {
         }
       case TargetDirection:
         {
-          float *dir;
-          if (state.target_direction == NULL) dir = (float *)malloc(sizeof(float));
-          else dir = state.target_direction;
+          float *dir = (float *)realloc(state.target_direction, sizeof(float));
           hs.readBytes((uint8_t *)dir, sizeof(float));
           state.target_direction = dir;
           break;
         }
       case CurrentDirection:
         {
-          float *dir;
-          if (state.current_direction == NULL) dir = (float *)malloc(sizeof(float));
-          else dir = state.current_direction;
+          float *dir = (float *)realloc(state.current_direction, sizeof(float));
           hs.readBytes((uint8_t *)dir, sizeof(float));
           state.current_direction = dir;
           break;
         }
       case Battery:
         {
-          float *bat;
-          if (state.battery == NULL) bat = (float *)malloc(sizeof(float));
-          else bat = state.battery;
+          float *bat = (float *)realloc(state.battery, sizeof(float));
           hs.readBytes((uint8_t *)bat, sizeof(float));
           state.battery = bat;
           break;
         }
       case Position:
         {
-          vector2_t *pos;
-          if (state.position == NULL) pos = (vector2_t *)malloc(sizeof(vector2_t));
-          else pos = state.position;
+          vector2_t *pos = (vector2_t *)realloc(state.position, sizeof(vector2_t));
           hs.readBytes((uint8_t *)&pos->x, sizeof(float));
           hs.readBytes((uint8_t *)&pos->y, sizeof(float));
           state.position = pos;
@@ -119,15 +111,7 @@ void recv_serial_packet() {
         {
           uint8_t len = 0;
           hs.readBytes(&len, 1);
-          vector2_t *route;
-          // Don't reallocate if possible
-          if (state.route != NULL && len == state.route_length) route = state.route;
-          else if (state.route != NULL) {
-            free(state.route);
-            state.route = NULL;
-          }
-          if (state.route == NULL) route = (vector2_t *)malloc(sizeof(vector2_t) * len);
-
+          vector2_t *route = (vector2_t *)realloc(state.route, sizeof(vector2_t) * len);
           for (int i = 0; i < len; i++) {
             hs.readBytes((uint8_t *)&route[i].x, sizeof(float));
             hs.readBytes((uint8_t *)&route[i].y, sizeof(float));
@@ -138,9 +122,7 @@ void recv_serial_packet() {
         }
       case Lidar:
         {
-          vector2_t *lidar;
-          if (state.position == NULL) lidar = (vector2_t *)malloc(sizeof(vector2_t));
-          else lidar = state.position;
+          vector2_t *lidar = (vector2_t *)realloc(state.lidar, sizeof(vector2_t));
           hs.readBytes((uint8_t *)&lidar->x, sizeof(float));
           hs.readBytes((uint8_t *)&lidar->y, sizeof(float));
           state.lidar = lidar;
