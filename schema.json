@@ -32,6 +32,10 @@
       "items": {
         "$ref": "#/$defs/position"
       }
+    },
+    "lidar": {
+      "description": "Point found by lidar",
+      "$ref": "#/$defs/position"
     }
   },
   "$defs": {

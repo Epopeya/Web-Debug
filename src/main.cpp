@@ -40,7 +40,8 @@ typedef enum {
   CurrentDirection,
   Battery,
   Position,
-  Route
+  Route,
+  Lidar
 } PacketHeader;
 
 struct packet_state {
@@ -52,9 +53,10 @@ struct packet_state {
   vector2_t *position;
   vector2_t *route;
   int route_length;
+  vector2_t *lidar;
 };
 
-struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL, .route = NULL, .route_length = 0 };
+struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL, .route = NULL, .route_length = 0, .lidar = NULL };
 
 // This parser doesn't account for endianness!
 void recv_serial_packet() {
@@ -134,6 +136,16 @@ void recv_serial_packet() {
           state.route_length = len;
           break;
         }
+      case Lidar:
+        {
+          vector2_t *lidar;
+          if (state.position == NULL) lidar = (vector2_t *)malloc(sizeof(vector2_t));
+          else lidar = state.position;
+          hs.readBytes((uint8_t *)&lidar->x, sizeof(float));
+          hs.readBytes((uint8_t *)&lidar->y, sizeof(float));
+          state.lidar = lidar;
+          break;
+        }
     }
   }
 }
@@ -177,6 +189,13 @@ void send_ws_packet() {
     }
     free(state.route);
     state.route_length = 0;
+  }
+  // Lidar
+  if (state.lidar != NULL) {
+    doc["lidar"][0] = state.lidar->x;
+    doc["lidar"][1] = state.lidar->y;
+    free(state.lidar);
+    state.lidar = NULL;
   }
 
   if (!doc.isNull()) {
