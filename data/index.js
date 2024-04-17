@@ -114,6 +114,9 @@ function refreshStatus() {
 }
 
 function msg(el) {
+    while (msg_text.childElementCount > 200) {
+        msg_text.lastElementChild.remove();
+    }
     msg_text.prepend(el);
 }
 
