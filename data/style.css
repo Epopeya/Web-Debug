@@ -43,24 +43,19 @@ html, body {
     position: relative;
     height: calc(100% - 20px);
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-.panel.msg > .content > code {
+.panel.msg > .content > p {
     font-size: 14px;
-    padding: 2px;
+    margin: 0px;
+    padding: 0px 2px;
     font-family: monospace;
-    font-weight: 600;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    font-weight: bold;
 }
 
-.panel.msg > .content > code > p {
-	margin: 0px;
-}
-
-.panel.msg > .content > code .client {
+.panel.msg > .content > .client {
     font-weight: normal;
     font-style: italic;
 }

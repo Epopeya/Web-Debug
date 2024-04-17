@@ -1,6 +1,6 @@
 const canvas = document.querySelector(".panel.map > .content > canvas");
 const status_label = document.querySelector(".bar .status");
-const msg_text = document.querySelector(".panel.msg .content > code");
+const msg_text = document.querySelector(".panel.msg .content");
 const battery_voltage = document.querySelector(".panel.status .content #battery_voltage");
 
 var socket_url = new URL("/ws", window.location.href);
@@ -114,7 +114,7 @@ function refreshStatus() {
 }
 
 function msg(el) {
-    msg_text.appendChild(el);
+    msg_text.prepend(el);
 }
 
 function log(str) {
@@ -143,8 +143,8 @@ function wsMessage(event) {
         switch(field) {
             case "msgs":
                 for (i in data) {
-		    let p = document.createElement("p");
-		    p.appendChild(document.createTextNode(data[i]));
+                    let p = document.createElement("p");
+                    p.appendChild(document.createTextNode(data[i]));
                     msg(p);
                 }
                 break;
