@@ -170,6 +170,7 @@ void send_ws_packet() {
       doc["route"][i][1] = state.route[i].y;
     }
     free(state.route);
+    state.route = NULL;
     state.route_length = 0;
   }
   // Lidar
