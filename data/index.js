@@ -114,12 +114,12 @@ function refreshStatus() {
 }
 
 function msg(str) {
-    msg_text.innerHTML += str + "<br>";
+   msg_text.insertAdjacentHTML("beforeend", str );
 }
 
 function log(str) {
     console.log(str);
-    msg("<span class=\"client\">" + str + "</span>");
+    msg("<p class=\"client\">" + str + "</p>");
 }
 
 function wsOpen(event) {
@@ -140,7 +140,7 @@ function wsMessage(event) {
         switch(field) {
             case "msgs":
                 for (i in data) {
-                    msg(data[i]);
+                    msg("<p>" + data[i] + "</p>");
                 }
                 break;
             case "pos":

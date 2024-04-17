@@ -9,7 +9,7 @@
 #include <LittleFS.h>
 
 #define HEARTBEAT 50
-#define MAX_MSGS 50
+#define MAX_MSGS 5
 unsigned long last_heartbeat = 0;
 
 AsyncWebServer webserver(80);

@@ -56,6 +56,10 @@ html, body {
     right: 0px;
 }
 
+.panel.msg > .content > code > p {
+	margin: 0px;
+}
+
 .panel.msg > .content > code .client {
     font-weight: normal;
     font-style: italic;
