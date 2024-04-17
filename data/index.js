@@ -113,13 +113,16 @@ function refreshStatus() {
     }
 }
 
-function msg(str) {
-   msg_text.insertAdjacentHTML("beforeend", str );
+function msg(el) {
+    msg_text.appendChild(el);
 }
 
 function log(str) {
     console.log(str);
-    msg("<p class=\"client\">" + str + "</p>");
+    let p = document.createElement("p");
+    p.className = "client";
+    p.appendChild(document.createTextNode(str));
+    msg(p);
 }
 
 function wsOpen(event) {
@@ -140,7 +143,9 @@ function wsMessage(event) {
         switch(field) {
             case "msgs":
                 for (i in data) {
-                    msg("<p>" + data[i] + "</p>");
+		    let p = document.createElement("p");
+		    p.appendChild(document.createTextNode(data[i]));
+                    msg(p);
                 }
                 break;
             case "pos":
