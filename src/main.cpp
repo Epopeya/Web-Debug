@@ -213,7 +213,9 @@ void setup() {
     request->send(200, "text/css", LittleFS.open("/style.css").readString());
   });
   webserver.on("/map.svg", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "image/svg+xml", LittleFS.open("/map.svg").readString());
+    AsyncWebServerResponse *response = request->beginResponse(200, "image/svg+xml", LittleFS.open("/map.svg").readString());
+    response->addHeader("Cache-Control", "max-age=86400");
+    request->send(response);
   });
 
   while (WiFi.status() != WL_CONNECTED) {
