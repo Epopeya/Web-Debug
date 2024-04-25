@@ -41,7 +41,8 @@ typedef enum {
   Battery,
   Position,
   Route,
-  Lidar
+  Lidar,
+  MapFlip
 } PacketHeader;
 
 struct packet_state {
@@ -54,9 +55,10 @@ struct packet_state {
   vector2_t *route;
   int route_length;
   vector2_t *lidar;
+  bool *map_flip;
 };
 
-struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL, .route = NULL, .route_length = 0, .lidar = NULL };
+struct packet_state state = { .messages = { NULL }, .messages_length = 0, .target_direction = NULL, .current_direction = NULL, .battery = NULL, .position = NULL, .route = NULL, .route_length = 0, .lidar = NULL, .map_flip = NULL };
 
 // This parser doesn't account for endianness!
 void recv_serial_packet() {
@@ -128,6 +130,13 @@ void recv_serial_packet() {
           state.lidar = lidar;
           break;
         }
+      case MapFlip:
+        {
+          bool *flipped = (bool *)realloc(state.map_flip, sizeof(bool));
+          hs.readBytes((uint8_t *)flipped, sizeof(bool));
+          state.map_flip = flipped;
+          break;
+        }
     }
   }
 }
@@ -179,6 +188,12 @@ void send_ws_packet() {
     doc["lidar"][1] = state.lidar->y;
     free(state.lidar);
     state.lidar = NULL;
+  }
+  // Flip
+  if (state.map_flip != NULL) {
+    doc["flip"] = *state.map_flip;
+    free(state.map_flip);
+    state.map_flip = NULL;
   }
 
   if (!doc.isNull()) {
