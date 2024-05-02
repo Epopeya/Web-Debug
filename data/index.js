@@ -51,7 +51,7 @@ function drawMap() {
     for (i in lidar) {
         ctx.save();
 
-        ctx.fillStyle = "#22228822";
+        ctx.fillStyle = "#7744AA44";
         ctx.beginPath();
         ctx.arc(lidar[i][0], lidar[i][1], 40, 0, 2 * Math.PI);
         ctx.fill();
