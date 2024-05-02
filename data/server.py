@@ -11,6 +11,7 @@ async def send_data(ws, path):
             "msgs": ["Message 1", "Message 2", "Message 3"],
             "bat": 3.7,
             "route": [[-1000, 1000], [0, 800], [1000, 1000], [1000, -1000]],
+            "points": [[100, 100], [-100, 100], [100, 0]],
         }))
         await asyncio.sleep(1)
 

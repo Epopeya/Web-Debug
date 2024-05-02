@@ -27,6 +27,8 @@ let robot_trot;
 let robot_bat;
 let robot_route;
 
+let lidar = [];
+
 function drawMap() {
     const ctx = canvas.getContext("2d");
     ctx.save();
@@ -45,6 +47,17 @@ function drawMap() {
     ctx.strokeRect(-1500, -1500, 3000, 3000);
     ctx.lineWidth = 40;
     ctx.strokeRect(-500, -500, 1000, 1000);
+
+    for (i in lidar) {
+        ctx.save();
+
+        ctx.fillStyle = "#22228822";
+        ctx.beginPath();
+        ctx.arc(lidar[i][0], lidar[i][1], 40, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.restore();
+    }
 
     if (robot_route != undefined) {
         let from = robot_pos;
@@ -165,6 +178,11 @@ function wsMessage(event) {
                 break;
             case "route":
                 robot_route = data;
+                break;
+            case "points":
+                for (i in data) {
+                    lidar.push(data[i]);
+                }
                 break;
             default:
                 log("unknown package \"" + field + "\"");
