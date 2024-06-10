@@ -179,7 +179,7 @@ function wsMessage(event) {
             case "route":
                 robot_route = data;
                 break;
-            case "points":
+            case "lidar":
                 for (i in data) {
                     lidar.push(data[i]);
                 }
