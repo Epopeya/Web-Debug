@@ -6,7 +6,7 @@ import random
 async def send_data(ws, path):
     while True:
         await ws.send(json.dumps({
-            "pos": [0, -1000],
+            "pos": [0, 0],
             "rot": 0,
             "trot": 0,
             "msgs": ["Message 1", "Message 2", "Message 3"],

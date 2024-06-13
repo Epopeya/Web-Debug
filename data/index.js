@@ -48,6 +48,8 @@ function drawMap() {
     ctx.lineWidth = 40;
     ctx.strokeRect(-500, -500, 1000, 1000);
 
+    ctx.translate(0, -1000);
+
     for (i in lidar) {
         ctx.save();
 
